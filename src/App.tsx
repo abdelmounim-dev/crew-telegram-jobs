@@ -8,6 +8,7 @@ import { AppProvider, useApp } from "./contexts/AppContext";
 import RoleSelection from "./pages/RoleSelection";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployerProfile from "./pages/EmployerProfile";
+import RecruiterDashboard from '@/components/RecruiterDashboard';
 import Dashboard from "./pages/Dashboard";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
@@ -69,6 +70,7 @@ const AppRoutes = () => {
         path="/" 
         element={userRole ? <Navigate to="/dashboard" replace /> : <RoleSelection />} 
       />
+      <Route path="/recruiters" element={<RecruiterDashboard />} />
       <Route path="/employee-profile" element={<EmployeeProfile />} />
       <Route path="/employer-profile" element={<EmployerProfile />} />
       <Route 

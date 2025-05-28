@@ -1,4 +1,3 @@
-
 import { Job } from '@/contexts/AppContext';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,33 +34,47 @@ const JobCard = ({ job, onApply, onEdit, onDelete, isEmployer = false }: JobCard
           <span>Posted: {formattedDate}</span>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between pt-2">
-        {isEmployer ? (
-          <>
+      <CardFooter className="flex flex-col gap-2 pt-2">
+        <div className="flex justify-between w-full">
+          {isEmployer ? (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onEdit}
+                className="text-xs"
+              >
+                Edit
+              </Button>
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={onDelete}
+                className="text-xs"
+              >
+                Delete
+              </Button>
+            </>
+          ) : (
             <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onEdit}
-              className="text-xs"
+              onClick={onApply} 
+              className="w-full text-sm"
             >
-              Edit
+              Contact Employer
             </Button>
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={onDelete}
-              className="text-xs"
+          )}
+        </div>
+        {isEmployer && (
+          <div className="flex justify-center w-full mt-2">
+            <Button
+              variant="default" // Use the primary color for emphasis
+              size="sm"
+              className="w-2/3 font-semibold"
+              onClick={() => alert('Candidats\' applications tracking will be implemented soon!')}
             >
-              Delete
+              Track
             </Button>
-          </>
-        ) : (
-          <Button 
-            onClick={onApply} 
-            className="w-full text-sm"
-          >
-            Contact Employer
-          </Button>
+          </div>
         )}
       </CardFooter>
     </Card>

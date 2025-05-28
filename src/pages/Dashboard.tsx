@@ -1,4 +1,6 @@
-
+import { fetchJobs } from '@/lib/api';
+import { fetchCrewMembers } from '@/lib/api';
+import { deleteJob as deleteJobApi } from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp, UserRole } from '@/contexts/AppContext';
@@ -10,11 +12,17 @@ import ProfileCard from '@/components/ProfileCard';
 import { showAlert, showConfirm } from '@/lib/telegram';
 
 const Dashboard = () => {
-  const { userRole, employeeProfile, employerProfile, jobs, employees, deleteJob } = useApp();
+  const { userRole, employeeProfile, employerProfile } = useApp();
   const navigate = useNavigate();
-  
+  const [jobs, setJobs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>('jobs');
-  
+  const [employees, setEmployees] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (userRole === 'employer') {
+      fetchCrewMembers().then(setEmployees);
+    }
+  }, [userRole]);
   useEffect(() => {
     // Set default tab based on user role
     if (userRole === 'employer') {
@@ -23,7 +31,19 @@ const Dashboard = () => {
       setActiveTab('browse');
     }
   }, [userRole]);
-  
+
+  useEffect(() => {
+    fetchJobs().then(setJobs);
+  }, []);
+  const mappedJobs = jobs.map(job => ({
+    id: job.id,
+    ...job.attributes,
+  }));
+  console.log('mappedJobsss:', jobs);
+  /*const displayJobs = userRole === 'employer'
+    ? mappedJobs.filter(job => employerProfile && job.createdBy === employerProfile.id)
+    : mappedJobs;*/
+  const displayJobs = jobs;
   const handleEditProfile = () => {
     if (userRole === 'employee') {
       navigate('/employee-profile');
@@ -36,17 +56,12 @@ const Dashboard = () => {
     navigate('/create-job');
   };
   
-  const handleContactProfile = (profileId: string) => {
-    const profile = employees.find(emp => emp.id === profileId);
-    if (profile) {
-      showAlert(`Contact ${profile.firstName} ${profile.lastName} via Telegram`);
-    }
-  };
-  
+
+
   const handleApplyForJob = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = displayJobs.find(j => j.id === jobId);
     if (job) {
-      showAlert(`You'll be directed to contact the employer for the job: ${job.title}`);
+      showAlert(`Contacting the employer directly via Telegram will be implemented soon`);
     }
   };
   
@@ -54,11 +69,23 @@ const Dashboard = () => {
     navigate(`/edit-job/${jobId}`);
   };
   
-  const handleDeleteJob = (jobId: string) => {
-    showConfirm('Are you sure you want to delete this job posting?', (confirmed) => {
+  const handleContactProfile = (profileId: string) => {
+    const profile = employees.find(emp => emp.id === profileId);
+    if (profile) {
+      showAlert(`Contact ${profile.firstName} will be supported soon with telegram account.`);
+    }
+  };
+  const handleDeleteJob = async (jobId: string) => {
+    showConfirm('Are you sure you want to delete this job posting?', async (confirmed) => {
       if (confirmed) {
-        deleteJob(jobId);
-        showAlert('Job posting deleted successfully');
+        try {
+          await deleteJobApi(jobId);
+          setJobs(jobs => jobs.filter(job => job.id !== jobId)); // Remove from local state
+          showAlert('Job posting deleted successfully');
+        } catch (error) {
+          showAlert('Failed to delete job');
+          console.error(error);
+        }
       }
     });
   };
@@ -79,12 +106,17 @@ const Dashboard = () => {
       return 'Employer';
     }
   };
-  
+
   // Filter jobs based on user role
-  const displayJobs = userRole === 'employer' 
-    ? jobs.filter(job => employerProfile && job.createdBy === employerProfile.id)
-    : jobs;
-  
+  console.log('employees:', employees);
+  // --- Refactored: Crew Filtering Logic ---
+  const validCrew = employees.filter(
+    emp =>
+      emp &&
+      typeof emp.firstName === 'string' &&
+      emp.firstName.trim() !== '' 
+  );
+  console.log('validCrew:', validCrew);
   return (
     <div className="container mx-auto px-4 py-4 pb-16">
       {/* Header with user info */}
@@ -93,31 +125,31 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold">{getDisplayName()}</h1>
           <p className="text-muted-foreground">{getRoleName()}</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={handleEditProfile}>
-          <Settings className="h-5 w-5" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="icon" onClick={handleEditProfile}>
+            <Settings className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              localStorage.removeItem('userRole');
+              window.location.href = '/';
+            }}
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
       
       {/* Tabs for different sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger value="jobs" className="flex items-center">
             <FileText className="h-4 w-4 mr-2" />
             {userRole === 'employer' ? 'My Jobs' : 'Job Listings'}
           </TabsTrigger>
-          <TabsTrigger value="browse" className="flex items-center">
-            {userRole === 'employer' ? (
-              <>
-                <User className="h-4 w-4 mr-2" />
-                Browse Crew
-              </>
-            ) : (
-              <>
-                <Search className="h-4 w-4 mr-2" />
-                Find Jobs
-              </>
-            )}
-          </TabsTrigger>
+
         </TabsList>
         
         {/* Jobs Tab */}
@@ -159,38 +191,39 @@ const Dashboard = () => {
         {/* Browse Tab */}
         <TabsContent value="browse" className="pt-4">
           {userRole === 'employer' ? (
-            // For employers: show crew profiles
             <div className="space-y-4">
-              {employees.filter(emp => emp.searchable).length > 0 ? (
-                employees
-                  .filter(emp => emp.searchable)
-                  .map(employee => (
-                    <ProfileCard 
-                      key={employee.id} 
-                      profile={employee}
-                      onContact={() => handleContactProfile(employee.id)}
-                    />
-                  ))
+              {validCrew.length > 0 ? (
+                validCrew.map(employee => (
+                  <ProfileCard
+                    key={employee.id}
+                    profile={employee}
+                    onContact={() => handleContactProfile(employee.id)}
+                  />
+                ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">No crew profiles available at the moment.</p>
+                  <p className="text-muted-foreground">
+                    No crew profiles available at the moment.
+                  </p>
                 </div>
               )}
             </div>
           ) : (
             // For crew: show job listings (same as jobs tab for now)
             <div className="space-y-4">
-              {jobs.length > 0 ? (
-                jobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
+              {displayJobs.length > 0 ? (
+                displayJobs.map(job => (
+                  <JobCard
+                    key={job.id}
                     job={job}
                     onApply={() => handleApplyForJob(job.id)}
                   />
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">No job listings available at the moment.</p>
+                  <p className="text-muted-foreground">
+                    No job listings available at the moment.
+                  </p>
                 </div>
               )}
             </div>

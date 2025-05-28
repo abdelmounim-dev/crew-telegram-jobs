@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "jobs",
+  "info": {
+    "singularName": "job",
+    "pluralName": "jobs",
+    "displayName": "Job",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "requiredPosition": {
+      "type": "string",
+      "required": true
+    },
+    "stat": {
+      "type": "enumeration",
+      "enum": [
+        "open",
+        "closed"
+      ],
+      "default": "open",
+      "required": false
+    },
+    "jobCreatedAt": {
+      "type": "datetime",
+      "default": "2025-05-24T22:00:00.000Z"
+    },
+    "recruiter": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::recruiter.recruiter",
+      "inversedBy": "jobs"
+    }
+  }
+}

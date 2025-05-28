@@ -1,4 +1,3 @@
-
 import { Employee } from '@/contexts/AppContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,8 +10,15 @@ interface ProfileCardProps {
 }
 
 const ProfileCard = ({ profile, onContact }: ProfileCardProps) => {
-  const initials = `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`;
-  
+  if (!profile.firstName && !profile.lastName) {
+    return null; // or a fallback UI
+  }
+  const initials = `${profile.firstName?.charAt(0) || ''}${profile.lastName?.charAt(0) || ''}`;  
+  const languages = Array.isArray(profile.languages)
+    ? profile.languages
+    : typeof profile.languages === 'string'
+      ? profile.languages.split(',').map(l => l.trim()).filter(Boolean)
+      : [];
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center gap-4 pb-2">
@@ -32,9 +38,9 @@ const ProfileCard = ({ profile, onContact }: ProfileCardProps) => {
         {profile.description && (
           <p className="text-sm text-gray-600 mb-2">{profile.description}</p>
         )}
-        {profile.languages && profile.languages.length > 0 && (
+        {languages.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
-            {profile.languages.map(language => (
+            {languages.map(language => (
               <span 
                 key={language}
                 className="px-2 py-0.5 text-xs bg-secondary rounded-full"

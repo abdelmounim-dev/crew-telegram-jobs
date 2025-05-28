@@ -1,4 +1,4 @@
-
+import { createJob } from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp, Job } from '@/contexts/AppContext';
@@ -29,11 +29,18 @@ const CreateJob = () => {
   const { employerProfile, addJob } = useApp();
   const navigate = useNavigate();
   
-  const [job, setJob] = useState<Partial<Job>>({
+  type JobForm = {
+    title: string;
+    description: string;
+    requiredPosition: string;
+    stat: string; // <-- allow 'stat'
+  };
+
+  const [job, setJob] = useState<JobForm>({
     title: '',
     description: '',
     requiredPosition: '',
-    status: 'open'
+    stat: 'open'
   });
   
   useEffect(() => {
@@ -63,30 +70,31 @@ const CreateJob = () => {
     setJob(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!job.title || !job.description || !job.requiredPosition) {
       alert('Please fill in all required fields');
       return;
     }
-    
+
     if (!employerProfile) {
       alert('You must be logged in as an employer to post jobs');
       navigate('/');
       return;
     }
-    
-    const newJob: Job = {
-      id: `job_${Date.now()}`,
-      title: job.title || '',
-      description: job.description || '',
-      requiredPosition: job.requiredPosition || '',
-      status: 'open',
-      createdBy: employerProfile.id,
-      createdAt: new Date()
-    };
-    
-    addJob(newJob);
-    navigate('/dashboard');
+
+    try {
+      await createJob({
+        title: job.title,
+        description: job.description,
+        requiredPosition: job.requiredPosition,
+        stat: 'open', // <-- change 'status' to 'stat'
+        // add other fields if needed
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      alert('Failed to create job. Please try again.');
+      console.error(error);
+    }
   };
   
   return (

@@ -1,4 +1,5 @@
 import { createJob } from '@/lib/api';
+import { showAlert } from '@/lib/telegram';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp, Job } from '@/contexts/AppContext';
@@ -72,12 +73,12 @@ const CreateJob = () => {
   
   const handleSubmit = async () => {
     if (!job.title || !job.description || !job.requiredPosition) {
-      alert('Please fill in all required fields');
+      showAlert('Please fill in all required fields');
       return;
     }
 
     if (!employerProfile) {
-      alert('You must be logged in as an employer to post jobs');
+      showAlert('You must be logged in as an employer to post jobs');
       navigate('/');
       return;
     }
@@ -92,7 +93,7 @@ const CreateJob = () => {
       });
       navigate('/dashboard');
     } catch (error) {
-      alert('Failed to create job. Please try again.');
+      showAlert('Failed to create job. Please try again.');
       console.error(error);
     }
   };

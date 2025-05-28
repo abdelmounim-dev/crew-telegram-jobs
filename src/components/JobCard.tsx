@@ -2,7 +2,7 @@ import { Job } from '@/contexts/AppContext';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users } from 'lucide-react';
-
+import { showAlert } from '@/lib/telegram';
 interface JobCardProps {
   job: Job;
   onApply?: () => void;
@@ -70,7 +70,7 @@ const JobCard = ({ job, onApply, onEdit, onDelete, isEmployer = false }: JobCard
               variant="default" // Use the primary color for emphasis
               size="sm"
               className="w-2/3 font-semibold"
-              onClick={() => alert('Candidats\' applications tracking will be implemented soon!')}
+              onClick={() => showAlert('Candidats\' applications tracking will be implemented soon!')}
             >
               Track
             </Button>

@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { showAlert } from '@/lib/telegram';
 import { useNavigate } from 'react-router-dom';
 import { useApp, AvailabilityStatus, Employee } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -97,7 +98,7 @@ const EmployeeProfile = () => {
   
   const handleSave = () => {
     if (!profile.firstName || !profile.profession) {
-      alert('Please fill in all required fields');
+      showAlert('Please fill in all required fields');
       return;
     }
     

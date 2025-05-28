@@ -12,7 +12,7 @@ import ProfileCard from '@/components/ProfileCard';
 import { showAlert, showConfirm } from '@/lib/telegram';
 
 const Dashboard = () => {
-  const { userRole, employeeProfile, employerProfile } = useApp();
+  const { userRole, employeeProfile, employerProfile, setUserRole } = useApp();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>('jobs');
@@ -130,11 +130,10 @@ const Dashboard = () => {
             <Settings className="h-5 w-5" />
           </Button>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() => {
               localStorage.removeItem('userRole');
-              window.location.href = '/';
+              setUserRole(null); // <-- Reset context state
+              navigate('/');     // Go to role selection
             }}
           >
             Sign Out

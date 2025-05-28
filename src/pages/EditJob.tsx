@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { showAlert } from '@/lib/telegram';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApp, Job } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -76,7 +77,7 @@ const EditJob = () => {
   
   const handleSubmit = () => {
     if (!job.title || !job.description || !job.requiredPosition) {
-      alert('Please fill in all required fields');
+      showAlert('Please fill in all required fields');
       return;
     }
     

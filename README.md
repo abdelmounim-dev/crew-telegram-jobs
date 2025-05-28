@@ -1,73 +1,113 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🚤 EasyCrew – Telegram Mini App Recruitment MVP
 
-**URL**: https://lovable.dev/projects/85e6b7b8-74b4-42ed-80ef-911fd73efb77
+**EasyCrew** is a Telegram Mini App MVP designed for yacht crew recruitment. It offers basic Create, Read, Update, and Delete (CRUD) functionalities, allowing employers to post jobs and browse crew, and crew members to create profiles and explore job listings—all seamlessly within Telegram. Built with **React (Vite)** and **TypeScript** on the frontend and **Strapi** on the backend, EasyCrew delivers a smooth, integrated experience.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- **Telegram Mini App**: Optimized for Telegram’s embedded web app environment.  
+- **Role Selection**: Users choose between Employer or Crew roles on first launch.  
+- **Employer Dashboard**: Post, edit, delete, and manage job listings.  
+- **Crew Dashboard**: Create/edit profiles, set availability, and browse available jobs.  
+- **Crew Browsing**: Employers can search and filter available crew members.  
+- **Strapi Backend**: Manages all job listings and user profiles via a user-friendly admin panel.  
+- **Telegram UI Integration**: Leverages native Telegram components like `MainButton`, `BackButton`, and alert/confirm dialogs for a native experience.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/85e6b7b8-74b4-42ed-80ef-911fd73efb77) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Getting Started
 
-**Use your preferred IDE**
+Follow these steps to get the project up and running locally:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Clone the Repository
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+git clone https://github.com/yourusername/easycrew-telegram-miniapp.git
+cd easycrew-telegram-miniapp
+````
 
-Follow these steps:
+### 2. Install Dependencies
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Install dependencies for both the frontend and backend:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# Frontend
+cd crew-telegram-jobs
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Backend
+cd ../backend
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 3. Configure Environment Variables
+
+#### Backend:
+
+* Inside the `backend/` directory, create a `.env` file (or copy from `.env.example`) and populate it with your Strapi settings.
+* Create an API token from Strapi admin under **Settings > API Tokens**.
+
+#### Frontend:
+
+* In the `crew-telegram-jobs/` directory, create a `.env` file with the following:
+
+```env
+VITE_STRAPI_API_KEY=your_strapi_api_key
+VITE_STRAPI_API_URL=http://localhost:1337/api
+```
+
+> You can find the API token used in `src/lib/api.ts`.
+
+### 4. Run the Backend (Strapi)
+
+```bash
+cd backend
+npm run develop
+# or
+yarn develop
+```
+
+This will launch the Strapi admin panel at [http://localhost:1337/admin](http://localhost:1337/admin).
+
+### 5. Run the Frontend
+
+```bash
+cd ../crew-telegram-jobs
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The frontend should be available at [http://localhost:3000](http://localhost:3000) (or another port if 3000 is in use).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🛠️ Project Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+easycrew-telegram-miniapp/
+├── backend/             # Strapi backend (API, DB, admin panel)
+└── crew-telegram-jobs/  # React frontend (Telegram Mini App)
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 📝 Usage
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+* Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
+* To test within Telegram, follow the guide at [Telegram Web Apps - Testing and Debug](https://core.telegram.org/bots/webapps#testing-and-debug).
+* On first launch, select your role (Employer or Crew) and start exploring features.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/85e6b7b8-74b4-42ed-80ef-911fd73efb77) and click on Share -> Publish.
+## 🧑‍💻 Tech Stack
 
-## Can I connect a custom domain to my Lovable project?
+* **Frontend**: React, TypeScript, Vite, Tailwind CSS
+* **Backend**: Strapi (Node.js Headless CMS)
+* **Telegram Mini App API**: For user authentication and native UI elements
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🚢 Project Deployment
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+🔧 Deployment instructions coming soon...

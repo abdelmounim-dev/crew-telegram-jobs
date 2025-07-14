@@ -1,3 +1,4 @@
+
 import { fetchJobs } from '@/lib/api';
 import { fetchCrewMembers } from '@/lib/api';
 import { deleteJob as deleteJobApi } from '@/lib/api';
@@ -23,27 +24,28 @@ const Dashboard = () => {
       fetchCrewMembers().then(setEmployees);
     }
   }, [userRole]);
+
   useEffect(() => {
     // Set default tab based on user role
     if (userRole === 'employer') {
       setActiveTab('jobs');
     } else {
-      setActiveTab('browse');
+      setActiveTab('jobs'); // employees see jobs by default
     }
   }, [userRole]);
 
   useEffect(() => {
     fetchJobs().then(setJobs);
   }, []);
+
   const mappedJobs = jobs.map(job => ({
     id: job.id,
     ...job.attributes,
   }));
+
   console.log('mappedJobsss:', jobs);
-  /*const displayJobs = userRole === 'employer'
-    ? mappedJobs.filter(job => employerProfile && job.createdBy === employerProfile.id)
-    : mappedJobs;*/
   const displayJobs = jobs;
+
   const handleEditProfile = () => {
     if (userRole === 'employee') {
       navigate('/employee-profile');
@@ -55,8 +57,6 @@ const Dashboard = () => {
   const handleCreateJob = () => {
     navigate('/create-job');
   };
-  
-
 
   const handleApplyForJob = (jobId: string) => {
     const job = displayJobs.find(j => j.id === jobId);
@@ -75,6 +75,7 @@ const Dashboard = () => {
       showAlert(`Contact ${profile.firstName} will be supported soon with telegram account.`);
     }
   };
+
   const handleDeleteJob = async (jobId: string) => {
     showConfirm('Are you sure you want to delete this job posting?', async (confirmed) => {
       if (confirmed) {
@@ -107,9 +108,8 @@ const Dashboard = () => {
     }
   };
 
-  // Filter jobs based on user role
   console.log('employees:', employees);
-  // --- Refactored: Crew Filtering Logic ---
+  
   const validCrew = employees.filter(
     emp =>
       emp &&
@@ -117,6 +117,7 @@ const Dashboard = () => {
       emp.firstName.trim() !== '' 
   );
   console.log('validCrew:', validCrew);
+
   return (
     <div className="container mx-auto px-4 py-4 pb-16">
       {/* Header with user info */}
@@ -132,8 +133,8 @@ const Dashboard = () => {
           <Button
             onClick={() => {
               localStorage.removeItem('userRole');
-              setUserRole(null); // <-- Reset context state
-              navigate('/');     // Go to role selection
+              setUserRole(null);
+              navigate('/');
             }}
           >
             Sign Out
@@ -143,12 +144,17 @@ const Dashboard = () => {
       
       {/* Tabs for different sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-1">
+        <TabsList className={`grid w-full ${userRole === 'employer' ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <TabsTrigger value="jobs" className="flex items-center">
             <FileText className="h-4 w-4 mr-2" />
             {userRole === 'employer' ? 'My Jobs' : 'Job Listings'}
           </TabsTrigger>
-
+          {userRole === 'employer' && (
+            <TabsTrigger value="crew" className="flex items-center">
+              <User className="h-4 w-4 mr-2" />
+              Browse Crew
+            </TabsTrigger>
+          )}
         </TabsList>
         
         {/* Jobs Tab */}
@@ -187,9 +193,9 @@ const Dashboard = () => {
           </div>
         </TabsContent>
         
-        {/* Browse Tab */}
-        <TabsContent value="browse" className="pt-4">
-          {userRole === 'employer' ? (
+        {/* Crew Tab - Only for Employers */}
+        {userRole === 'employer' && (
+          <TabsContent value="crew" className="pt-4">
             <div className="space-y-4">
               {validCrew.length > 0 ? (
                 validCrew.map(employee => (
@@ -207,27 +213,8 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-          ) : (
-            // For crew: show job listings (same as jobs tab for now)
-            <div className="space-y-4">
-              {displayJobs.length > 0 ? (
-                displayJobs.map(job => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    onApply={() => handleApplyForJob(job.id)}
-                  />
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    No job listings available at the moment.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { Employee } from '@/contexts/AppContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,11 +15,15 @@ const ProfileCard = ({ profile, onContact }: ProfileCardProps) => {
     return null; // or a fallback UI
   }
   const initials = `${profile.firstName?.charAt(0) || ''}${profile.lastName?.charAt(0) || ''}`;  
-  const languages = Array.isArray(profile.languages)
-    ? profile.languages
-    : typeof profile.languages === 'string'
-      ? profile.languages.split(',').map(l => l.trim()).filter(Boolean)
-      : [];
+  
+  // Fix the languages handling to avoid TypeScript type narrowing issues
+  let languages: string[] = [];
+  if (Array.isArray(profile.languages)) {
+    languages = profile.languages;
+  } else if (typeof profile.languages === 'string') {
+    languages = profile.languages.split(',').map(l => l.trim()).filter(Boolean);
+  }
+
   return (
     <Card className="w-full shadow-sm hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center gap-4 pb-2">

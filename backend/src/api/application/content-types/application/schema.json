@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "applications",
+  "info": {
+    "singularName": "application",
+    "pluralName": "applications",
+    "displayName": "Application",
+    "description": "Job applications from crew to positions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "job": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::job.job",
+      "inversedBy": "applications"
+    },
+    "crew": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::crew-profile.crew-profile",
+      "inversedBy": "applications"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "viewed", "accepted", "rejected", "withdrawn"],
+      "default": "pending"
+    },
+    "message": {
+      "type": "richtext"
+    },
+    "appliedAt": {
+      "type": "datetime"
+    },
+    "viewedAt": {
+      "type": "datetime"
+    },
+    "respondedAt": {
+      "type": "datetime"
+    },
+    "ownerNotes": {
+      "type": "text"
+    }
+  }
+}

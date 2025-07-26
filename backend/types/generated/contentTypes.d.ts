@@ -373,50 +373,119 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiCrewMemberCrewMember extends Struct.CollectionTypeSchema {
-  collectionName: 'crew_members';
+export interface ApiApplicationApplication extends Struct.CollectionTypeSchema {
+  collectionName: 'applications';
   info: {
-    displayName: 'CrewMember';
-    pluralName: 'crew-members';
-    singularName: 'crew-member';
+    description: 'Job applications from crew to positions';
+    displayName: 'Application';
+    pluralName: 'applications';
+    singularName: 'application';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    availability: Schema.Attribute.Enumeration<
-      ['available', 'looking', 'occupied']
-    > &
-      Schema.Attribute.Required;
+    appliedAt: Schema.Attribute.DateTime;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
-    familyName: Schema.Attribute.String & Schema.Attribute.Required;
-    firstName: Schema.Attribute.String & Schema.Attribute.Required;
-    languages: Schema.Attribute.Text & Schema.Attribute.Required;
+    crew: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::crew-profile.crew-profile'
+    >;
+    job: Schema.Attribute.Relation<'manyToOne', 'api::job.job'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::crew-member.crew-member'
+      'api::application.application'
     > &
       Schema.Attribute.Private;
-    profession: Schema.Attribute.String & Schema.Attribute.Required;
+    message: Schema.Attribute.RichText;
+    ownerNotes: Schema.Attribute.Text;
     publishedAt: Schema.Attribute.DateTime;
-    searchable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    respondedAt: Schema.Attribute.DateTime;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'viewed', 'accepted', 'rejected', 'withdrawn']
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    viewedAt: Schema.Attribute.DateTime;
+  };
+}
+
+export interface ApiCrewProfileCrewProfile extends Struct.CollectionTypeSchema {
+  collectionName: 'crew_profiles';
+  info: {
+    description: 'Professional profile for yacht crew members';
+    displayName: 'Crew Profile';
+    pluralName: 'crew-profiles';
+    singularName: 'crew-profile';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    applications: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::application.application'
+    >;
+    availabilityStatus: Schema.Attribute.Enumeration<
+      ['available', 'busy', 'not_available']
+    > &
+      Schema.Attribute.DefaultTo<'available'>;
+    bio: Schema.Attribute.RichText;
+    certifications: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    cv: Schema.Attribute.Media<'files'>;
+    experienceYears: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 50;
+          min: 0;
+        },
+        number
+      >;
+    languages: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::crew-profile.crew-profile'
+    > &
+      Schema.Attribute.Private;
+    portfolioImages: Schema.Attribute.Media<'images', true>;
+    position: Schema.Attribute.Enumeration<
+      [
+        'captain',
+        'chef',
+        'deckhand',
+        'engineer',
+        'stewardess',
+        'first_mate',
+        'bosun',
+        'second_engineer',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-profile.user-profile'
+    >;
   };
 }
 
 export interface ApiJobJob extends Struct.CollectionTypeSchema {
   collectionName: 'jobs';
   info: {
-    description: '';
+    description: 'Job postings for yacht crew positions';
     displayName: 'Job';
     pluralName: 'jobs';
     singularName: 'job';
@@ -425,58 +494,215 @@ export interface ApiJobJob extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    applications: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::application.application'
+    >;
+    contactEmail: Schema.Attribute.Email;
+    contactPhone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }>;
+    contractType: Schema.Attribute.Enumeration<
+      ['permanent', 'temporary', 'seasonal', 'day_work']
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text & Schema.Attribute.Required;
-    jobCreatedAt: Schema.Attribute.DateTime &
-      Schema.Attribute.DefaultTo<'2025-05-24T22:00:00.000Z'>;
+    description: Schema.Attribute.RichText & Schema.Attribute.Required;
+    endDate: Schema.Attribute.Date;
+    experienceRequired: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::job.job'> &
       Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    recruiter: Schema.Attribute.Relation<
+    location: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    owner: Schema.Attribute.Relation<
       'manyToOne',
-      'api::recruiter.recruiter'
+      'api::owner-profile.owner-profile'
     >;
-    requiredPosition: Schema.Attribute.String & Schema.Attribute.Required;
-    stat: Schema.Attribute.Enumeration<['open', 'closed']> &
-      Schema.Attribute.DefaultTo<'open'>;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
+    position: Schema.Attribute.Enumeration<
+      [
+        'captain',
+        'chef',
+        'deckhand',
+        'engineer',
+        'stewardess',
+        'first_mate',
+        'bosun',
+        'second_engineer',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    requirements: Schema.Attribute.RichText;
+    salaryRange: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    startDate: Schema.Attribute.Date;
+    status: Schema.Attribute.Enumeration<['active', 'closed', 'draft']> &
+      Schema.Attribute.DefaultTo<'active'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
   };
 }
 
-export interface ApiRecruiterRecruiter extends Struct.CollectionTypeSchema {
-  collectionName: 'recruiters';
+export interface ApiOwnerProfileOwnerProfile
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'owner_profiles';
   info: {
-    displayName: 'Recruiter';
-    pluralName: 'recruiters';
-    singularName: 'recruiter';
+    description: 'Profile for yacht owners and managers';
+    displayName: 'Owner Profile';
+    pluralName: 'owner-profiles';
+    singularName: 'owner-profile';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
+  };
+  attributes: {
+    companyName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    jobs: Schema.Attribute.Relation<'oneToMany', 'api::job.job'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::owner-profile.owner-profile'
+    > &
+      Schema.Attribute.Private;
+    operatingRegions: Schema.Attribute.JSON;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-profile.user-profile'
+    >;
+    yachtName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    yachtSize: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    yachtType: Schema.Attribute.Enumeration<
+      ['motor_yacht', 'sailing_yacht', 'super_yacht', 'catamaran', 'other']
+    >;
+  };
+}
+
+export interface ApiTelegramAuthTelegramAuth
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'telegram_auths';
+  info: {
+    displayName: 'Telegram Auth';
+    pluralName: 'telegram-auths';
+    singularName: 'telegram-auth';
+  };
+  options: {
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    email: Schema.Attribute.Email;
-    jobs: Schema.Attribute.Relation<'oneToMany', 'api::job.job'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::recruiter.recruiter'
+      'api::telegram-auth.telegram-auth'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    surname: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiUserProfileUserProfile extends Struct.CollectionTypeSchema {
+  collectionName: 'user_profiles';
+  info: {
+    description: 'Extended user profile information';
+    displayName: 'User Profile';
+    pluralName: 'user-profiles';
+    singularName: 'user-profile';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    crewProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::crew-profile.crew-profile'
+    >;
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-profile.user-profile'
+    > &
+      Schema.Attribute.Private;
+    location: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    ownerProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::owner-profile.owner-profile'
+    >;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }>;
+    profilePhoto: Schema.Attribute.Media<'images'>;
+    publishedAt: Schema.Attribute.DateTime;
+    telegramId: Schema.Attribute.String & Schema.Attribute.Unique;
+    telegramUsername: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    userType: Schema.Attribute.Enumeration<['crew', 'owner']> &
+      Schema.Attribute.Required;
   };
 }
 
@@ -967,6 +1193,7 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    telegram_id: Schema.Attribute.String & Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -976,6 +1203,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    userProfile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-profile.user-profile'
+    >;
   };
 }
 
@@ -989,9 +1220,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::crew-member.crew-member': ApiCrewMemberCrewMember;
+      'api::application.application': ApiApplicationApplication;
+      'api::crew-profile.crew-profile': ApiCrewProfileCrewProfile;
       'api::job.job': ApiJobJob;
-      'api::recruiter.recruiter': ApiRecruiterRecruiter;
+      'api::owner-profile.owner-profile': ApiOwnerProfileOwnerProfile;
+      'api::telegram-auth.telegram-auth': ApiTelegramAuthTelegramAuth;
+      'api::user-profile.user-profile': ApiUserProfileUserProfile;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

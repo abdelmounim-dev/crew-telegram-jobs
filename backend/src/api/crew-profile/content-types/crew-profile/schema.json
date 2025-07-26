@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "crew_profiles",
+  "info": {
+    "singularName": "crew-profile",
+    "pluralName": "crew-profiles",
+    "displayName": "Crew Profile",
+    "description": "Professional profile for yacht crew members"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "userProfile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-profile.user-profile",
+      "inversedBy": "crewProfile"
+    },
+    "position": {
+      "type": "enumeration",
+      "enum": [
+        "captain",
+        "chef",
+        "deckhand",
+        "engineer",
+        "stewardess",
+        "first_mate",
+        "bosun",
+        "second_engineer",
+        "other"
+      ],
+      "required": true
+    },
+    "experienceYears": {
+      "type": "integer",
+      "min": 0,
+      "max": 50
+    },
+    "bio": {
+      "type": "richtext"
+    },
+    "cv": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"]
+    },
+    "availabilityStatus": {
+      "type": "enumeration",
+      "enum": ["available", "busy", "not_available"],
+      "default": "available"
+    },
+    "portfolioImages": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "certifications": {
+      "type": "text"
+    },
+    "languages": {
+      "type": "json"
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::application.application",
+      "mappedBy": "crew"
+    }
+  }
+}

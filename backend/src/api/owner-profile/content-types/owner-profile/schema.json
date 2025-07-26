@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "owner_profiles",
+  "info": {
+    "singularName": "owner-profile",
+    "pluralName": "owner-profiles",
+    "displayName": "Owner Profile",
+    "description": "Profile for yacht owners and managers"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "userProfile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-profile.user-profile",
+      "inversedBy": "ownerProfile"
+    },
+    "companyName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "yachtName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "yachtSize": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "yachtType": {
+      "type": "enumeration",
+      "enum": ["motor_yacht", "sailing_yacht", "super_yacht", "catamaran", "other"]
+    },
+    "operatingRegions": {
+      "type": "json"
+    },
+    "jobs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::job.job",
+      "mappedBy": "owner"
+    }
+  }
+}

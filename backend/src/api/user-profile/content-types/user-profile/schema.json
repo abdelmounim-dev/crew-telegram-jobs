@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_profiles",
+  "info": {
+    "singularName": "user-profile",
+    "pluralName": "user-profiles",
+    "displayName": "User Profile",
+    "description": "Extended user profile information"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "userProfile"
+    },
+    "userType": {
+      "type": "enumeration",
+      "enum": ["crew", "owner"],
+      "required": true
+    },
+    "firstName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "profilePhoto": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "location": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "telegramId": {
+      "type": "string",
+      "unique": true
+    },
+    "telegramUsername": {
+      "type": "string"
+    },
+    "crewProfile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::crew-profile.crew-profile",
+      "mappedBy": "userProfile"
+    },
+    "ownerProfile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::owner-profile.owner-profile",
+      "mappedBy": "userProfile"
+    }
+  }
+}

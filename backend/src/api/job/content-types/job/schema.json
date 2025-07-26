@@ -5,42 +5,85 @@
     "singularName": "job",
     "pluralName": "jobs",
     "displayName": "Job",
-    "description": ""
+    "description": "Job postings for yacht crew positions"
   },
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "string",
-      "required": true
-    },
-    "description": {
-      "type": "text",
-      "required": true
-    },
-    "requiredPosition": {
-      "type": "string",
-      "required": true
-    },
-    "stat": {
-      "type": "enumeration",
-      "enum": [
-        "open",
-        "closed"
-      ],
-      "default": "open",
-      "required": false
-    },
-    "jobCreatedAt": {
-      "type": "datetime",
-      "default": "2025-05-24T22:00:00.000Z"
-    },
-    "recruiter": {
+    "owner": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::recruiter.recruiter",
+      "target": "api::owner-profile.owner-profile",
       "inversedBy": "jobs"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "richtext",
+      "required": true
+    },
+    "position": {
+      "type": "enumeration",
+      "enum": [
+        "captain",
+        "chef",
+        "deckhand",
+        "engineer",
+        "stewardess",
+        "first_mate",
+        "bosun",
+        "second_engineer",
+        "other"
+      ],
+      "required": true
+    },
+    "location": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "salaryRange": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["active", "closed", "draft"],
+      "default": "active"
+    },
+    "requirements": {
+      "type": "richtext"
+    },
+    "contactEmail": {
+      "type": "email"
+    },
+    "contactPhone": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "contractType": {
+      "type": "enumeration",
+      "enum": ["permanent", "temporary", "seasonal", "day_work"]
+    },
+    "experienceRequired": {
+      "type": "integer",
+      "min": 0
+    },
+    "applications": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::application.application",
+      "mappedBy": "job"
     }
   }
 }

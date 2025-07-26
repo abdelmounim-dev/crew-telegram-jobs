@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "telegram_auths",
+  "info": {
+    "singularName": "telegram-auth",
+    "pluralName": "telegram-auths",
+    "displayName": "Telegram Auth"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}

@@ -50,7 +50,7 @@
     "isActive": {
       "type": "boolean",
       "default": true
-    },
+    }
     
     "crewProfile": {
       "type": "relation",

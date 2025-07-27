@@ -614,34 +614,6 @@ export interface ApiOwnerProfileOwnerProfile
   };
 }
 
-export interface ApiTelegramAuthTelegramAuth
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'telegram_auths';
-  info: {
-    displayName: 'Telegram Auth';
-    pluralName: 'telegram-auths';
-    singularName: 'telegram-auth';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::telegram-auth.telegram-auth'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiUserProfileUserProfile extends Struct.CollectionTypeSchema {
   collectionName: 'user_profiles';
   info: {
@@ -692,8 +664,6 @@ export interface ApiUserProfileUserProfile extends Struct.CollectionTypeSchema {
       }>;
     profilePhoto: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
-    telegramId: Schema.Attribute.String & Schema.Attribute.Unique;
-    telegramUsername: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1193,7 +1163,6 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
-    telegram_id: Schema.Attribute.String & Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1224,7 +1193,6 @@ declare module '@strapi/strapi' {
       'api::crew-profile.crew-profile': ApiCrewProfileCrewProfile;
       'api::job.job': ApiJobJob;
       'api::owner-profile.owner-profile': ApiOwnerProfileOwnerProfile;
-      'api::telegram-auth.telegram-auth': ApiTelegramAuthTelegramAuth;
       'api::user-profile.user-profile': ApiUserProfileUserProfile;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

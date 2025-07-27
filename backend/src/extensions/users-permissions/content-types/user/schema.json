@@ -65,11 +65,7 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "telegram_id": {
-      "type": "string",
-      "unique": true,
-      "configurable": false
-    },
+    
     "userProfile": {
       "type": "relation",
       "relation": "oneToOne",

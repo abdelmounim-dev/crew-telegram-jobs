@@ -1,49 +1,62 @@
-const axios = require("axios");
-const crypto = require("crypto");
+const crypto = require('crypto');
+const axios = require('axios');
 
-const BOT_TOKEN = "8319236603:AAEEDn6258A6lO_63Ex5IL-pzUrU-oUmBtI"; // Replace this
-const STRAPI_URL = "http://localhost:1337"; // Replace with your actual URL
+// --- 1. Configuration ---
+const STRAPI_URL = 'http://localhost:1337';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-const telegramUser = {
-  id: 123456789, // Replace with real Telegram ID
-  first_name: "John",
-  last_name: "Doe",
-  username: "johndoe",
-  auth_date: Math.floor(Date.now() / 1000), // Current timestamp
-};
-
-// Step 1: Generate the Telegram hash
-function generateHash(data, token) {
-  const secret = crypto.createHash("sha256").update(token).digest();
-  const sorted = Object.keys(data)
-    .sort()
-    .map((key) => `${key}=${data[key]}`)
-    .join("\n");
-
-  const hmac = crypto.createHmac("sha256", secret).update(sorted).digest("hex");
-  return hmac;
+if (!BOT_TOKEN) {
+  console.error('Error: TELEGRAM_BOT_TOKEN is not set in your environment variables.');
+  console.error('Please add it to your .env file and try again.');
+  process.exit(1);
 }
 
-// Step 2: Send POST request
-async function testTelegramLogin() {
-  const payload = {
-    ...telegramUser,
-    hash: generateHash(telegramUser, BOT_TOKEN),
-  };
+// --- 2. Test User Data ---
+// This simulates the data received from the Telegram login widget.
+const userData = {
+  id: 123456789, // Use a unique ID for testing
+  first_name: 'Test',
+  last_name: 'User',
+  username: 'testuser',
+  photo_url: 'https://t.me/i/userpic/320/testuser.jpg',
+  auth_date: Math.floor(Date.now() / 1000),
+};
 
+// --- 3. Generate Telegram Hash ---
+const dataCheckString = Object.keys(userData)
+  .sort()
+  .map(key => `${key}=${userData[key]}`)
+  .join('\n');
+
+const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();
+const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
+
+// --- 4. Construct Callback URL ---
+const params = new URLSearchParams({
+  ...userData,
+  hash: hmac,
+});
+
+const callbackUrl = `${STRAPI_URL}/api/auth/telegram/callback?${params.toString()}`;
+
+// --- 5. Make the API Request ---
+async function testTelegramAuth() {
+  console.log('Sending request to:', callbackUrl);
   try {
-    const res = await axios.post(
-      `${STRAPI_URL}/api/auth/telegram/callback`,
-      payload,
-    );
-    console.log("✅ Login successful:", res.data);
-  } catch (err) {
-    if (err.response) {
-      console.error("❌ Server error:", err.response.data);
+    const response = await axios.get(callbackUrl);
+    console.log('\n✅ Success! Authentication successful.');
+    console.log('\n--- Server Response ---');
+    console.log(response.data);
+  } catch (error) {
+    console.error('\n❌ Error! Authentication failed.');
+    if (error.response) {
+      console.error('\n--- Server Error Response ---');
+      console.error(`Status: ${error.response.status}`);
+      console.error('Data:', error.response.data);
     } else {
-      console.error("❌ Error:", err.message);
+      console.error('Error:', error.message);
     }
   }
 }
 
-testTelegramLogin();
+testTelegramAuth();

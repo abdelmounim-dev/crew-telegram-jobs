@@ -51,13 +51,7 @@
       "type": "boolean",
       "default": true
     },
-    "telegramId": {
-      "type": "string",
-      "unique": true
-    },
-    "telegramUsername": {
-      "type": "string"
-    },
+    
     "crewProfile": {
       "type": "relation",
       "relation": "oneToOne",

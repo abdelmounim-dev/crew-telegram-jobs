@@ -13,6 +13,11 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Placeholder for Telegram authentication
+require('dotenv').config();
+const crypto = require('crypto');
+
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
 app.post('/auth/telegram', (req, res) => {
   const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
@@ -42,7 +47,27 @@ app.use('/api/user-profiles', userProfileRoutes);
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
-  res.status(200).json({ message: 'Telegram authentication placeholder' });
+  const data = req.body;
+  const { hash, ...otherData } = data;
+
+  const checkString = Object.keys(otherData)
+    .sort()
+    .map(key => `${key}=${otherData[key]}`)
+    .join('\n');
+
+  const secretKey = crypto.createHash('sha256').update(BOT_TOKEN).digest();
+  const hmac = crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
+
+  if (hmac === hash) {
+    // Authentication successful
+    // You can now process the user data (e.g., create/update user in your DB)
+    console.log('Telegram authentication successful:', data);
+    res.status(200).json({ message: 'Telegram authentication successful', user: data });
+  } else {
+    // Authentication failed
+    console.log('Telegram authentication failed: Invalid hash');
+    res.status(401).json({ message: 'Unauthorized: Invalid hash' });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

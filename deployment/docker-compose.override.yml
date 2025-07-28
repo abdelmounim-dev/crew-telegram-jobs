@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  express-backend:
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+
+  gateway:
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      STRAPI_URL: http://localhost:1337

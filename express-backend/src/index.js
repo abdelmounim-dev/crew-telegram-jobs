@@ -14,7 +14,8 @@ app.use(cors());
 
 // Placeholder for Telegram authentication
 app.post('/auth/telegram', (req, res) => {
-  // TODO: Implement Telegram authentication logic
+  const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
   res.status(200).json({ message: 'Telegram authentication placeholder' });
 });
 

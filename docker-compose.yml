@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  express-backend:
+    build:
+      context: ./express-backend
+      dockerfile: Dockerfile
+    container_name: express-backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./express-backend:/app
+      - /app/node_modules
+
+  telegram-auth-app:
+    build:
+      context: ./telegram-auth-app
+      dockerfile: Dockerfile
+    container_name: telegram-auth-app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./telegram-auth-app:/app
+      - /app/node_modules
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      STRAPI_URL: http://localhost:1337 # Assuming Strapi runs on 1337
+    depends_on:
+      - express-backend
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - express-backend
+      - gateway
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:

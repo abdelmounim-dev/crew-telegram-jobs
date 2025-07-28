@@ -14,7 +14,10 @@ app.use(cors());
 
 // Placeholder for Telegram authentication
 app.post('/auth/telegram', (req, res) => {
-  const fileRoutes = require('./routes/fileRoutes');
+  const roleRoutes = require('./routes/roleRoutes');
+app.use('/api/roles', roleRoutes);
+
+const fileRoutes = require('./routes/fileRoutes');
 app.use('/api/files', fileRoutes);
 
 const applicationRoutes = require('./routes/applicationRoutes');

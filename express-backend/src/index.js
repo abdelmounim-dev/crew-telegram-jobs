@@ -14,7 +14,12 @@ app.use(cors());
 
 // Placeholder for Telegram authentication
 app.post('/auth/telegram', (req, res) => {
-  const roleRoutes = require('./routes/roleRoutes');
+  const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+const roleRoutes = require('./routes/roleRoutes');
 app.use('/api/roles', roleRoutes);
 
 const fileRoutes = require('./routes/fileRoutes');

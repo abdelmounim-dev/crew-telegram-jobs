@@ -664,6 +664,8 @@ export interface ApiUserProfileUserProfile extends Struct.CollectionTypeSchema {
       }>;
     profilePhoto: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
+    telegramId: Schema.Attribute.String & Schema.Attribute.Unique;
+    telegramUsername: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

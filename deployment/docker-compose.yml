@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      STRAPI_URL: http://strapi:1337
+
+  strapi:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "1337:1337"
+    volumes:
+      - ../backend:/opt/app
+    environment:
+      NODE_ENV: development
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/data.db
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - gateway
+    environment:
+      NODE_ENV: production

@@ -16,7 +16,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "userProfile"
+      "inversedBy": "userProfile",
+      "writable": true,
+      "visible": false
     },
     "userType": {
       "type": "enumeration",
@@ -50,8 +52,7 @@
     "isActive": {
       "type": "boolean",
       "default": true
-    }
-    
+    },
     "crewProfile": {
       "type": "relation",
       "relation": "oneToOne",

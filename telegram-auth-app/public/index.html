@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Login Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login with Telegram</h1>
+        <p>Click the button below to log in with your Telegram account.</p>
+        <script async src="https://telegram.org/js/telegram-widget.js?2" data-telegram-login="crew_test_bot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+        <script type="text/javascript">
+            function onTelegramAuth(user) {
+                // user object contains: id, first_name, last_name, username, photo_url, auth_date, hash
+                console.log('Telegram Auth Data:', user);
+
+                // Send this data to your backend
+                fetch('/auth/telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(user)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Backend Response:', data);
+                    alert('Auth data sent to server. Check server console for details.\n\n' + JSON.stringify(user, null, 2));
+                })
+                .catch(error => {
+                    console.error('Error sending data to backend:', error);
+                    alert('Error sending data to server. Check console.');
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>
